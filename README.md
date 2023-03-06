@@ -27,7 +27,7 @@ You can then perform various operations on the Image object, such as converting 
 myImage.grayscale_avg();
 
 // Apply a color mask to the image
-myImage.colorMask(1.0, 0.0, 0.0);
+myImage.colorMask(0.0, 1.0, 1.0);
 ```
 Finally, you can save the modified Image object to a new file using the write method.
 
@@ -46,3 +46,6 @@ std::vector<std::string> asciiLines = img.convertToAscii(densityString);
 ```
 The convertToAscii method returns a vector of strings, where each string represents a line of the ASCII representation of the image.
 
+### Examples
+
+To see how these methods modifies images, please take a look inside of the examples folder.
