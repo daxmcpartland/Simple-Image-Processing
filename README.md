@@ -38,8 +38,11 @@ myImage.write("path/to/new/image.png");
 ### Ascii conversion
 The Image class also provides functionality to convert an image object to an ASCII representaion. You can do this by passing in the desired density string, which specifies the ASCII characters to use for each pixel intensity, to the convertToAscii method.
 ```
+/// Density string 
+const std::string densityString = " .:-=+*#%@";
+
 // Convert the image to ASCII
-std::vector<std::string> asciiLines = converter.convertToAscii(myImage, 80);
+std::vector<std::string> asciiLines = img.convertToAscii(densityString);
 ```
 The convertToAscii method returns a vector of strings, where each string represents a line of the ASCII representation of the image.
 
