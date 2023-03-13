@@ -19,9 +19,11 @@ Example Usuage:
 */
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#define BYTE_BOUND(value) value < 0 ? 0 : (value > 255 ? 255 : value)
 #include "Image.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include <iostream>
 
     /// @brief Constructor for Image object, takes a string for a filename. This will either print out "Read (filename)" if it worked or "Failed to read 
     ///  (filename)" if it could not read the file.
@@ -192,4 +194,87 @@ Example Usuage:
         return densityString.at(charValue);
     }
 
+    /// @brief Get the width of the image
+    /// @return 
+    int Image::widthSize(){
+        return width;
+    }
+
+    /// @brief Get the height of the image
+    /// @return 
+    int Image::heightSize(){
+        return height;
+    }
+
+    /// @brief Used to crop an image. This method will delete all parts of the image that are outside of the given boundss. Example below
+    /// 
+    ///   Let's say we have an image that is 5x3. Or 5 pixels in width, and 3 pixels in height. 
+    ///                        _ _ _ _ _
+    ///                       |         |
+    ///                       |         |
+    ///                       |         |
+    ///                        ‾ ‾ ‾ ‾ ‾
+    ///   img.crop(0, 2, 1, img.heightSize()); would result in the following 
+    ///             
+    ///            startingWidth   endingWidth
+    ///                        |   |
+    ///                        ˅   ˅
+    ///                        _ _ _ _ _
+    ///                       |         |
+    ///    startingHeight  -->|         |
+    ///      endingHeight  -->|         |
+    ///                        ‾ ‾ ‾ ‾ ‾
+    ///
+    ///   So the image now looks like the following:
+    ///             _ _ _ 
+    ///            |     |
+    ///            |     |
+    ///             ‾ ‾ ‾ 
+    /// 
+    /// @param startingWidth - the leftmost edge of the cropped image. 0 if you want to keep the same left side 
+    /// @param endingWidth - the rightmost edge of the cropped image. img.widthSize() if you want to keep the same right side 
+    /// @param startingHeight - the topmost edge of the cropped image. 0 if you want to keep the same top side 
+    /// @param endingHeight - the bottommost edge of the cropped image. img.heightSize() if you want to keep the same bottom side 
+    /// @return 
+    Image& Image::crop(int startingWidth, int endingWidth, int startingHeight, int endingHeight){
+        if(endingWidth > this->width || startingWidth < 0 || endingWidth < startingWidth){
+            printf("[CROPPING ERROR] Given width is invalid");
+            return *this;
+        }
+        if(endingHeight > this->height || startingHeight < 0 || endingHeight < startingHeight){
+            printf("[CROPPING ERROR] Given height is invalid");
+            return *this;
+        }
+       
+       // Create a temp image to store the cropped image in
+        uint8_t tempImgData[(endingWidth+1 - startingWidth) * (endingHeight+1 - startingHeight) * channels] = {0};
+        int heightCounter = 0;
+        int tempImgIndex = 0;
+
+        // Go through the current image and put the cropped version into the tempory image data array
+        for(int i = 0; i < (int)size; i+=channels){
+            if((i/channels) % width == 0 && i != 0){
+                heightCounter++;
+            }
+            if((i/channels) % width >= startingWidth && (i/channels) % width <= endingWidth && heightCounter >= startingHeight && heightCounter <= endingHeight){
+                tempImgData[tempImgIndex] = data[i];
+                tempImgData[tempImgIndex + 1] = data[i + 1];
+                tempImgData[tempImgIndex + 2] = data[i + 2];
+                tempImgIndex+=channels;
+            }
+        }
+
+        // Now update the current data array
+        free(data);
+        width  = endingWidth+1 - startingWidth;
+        height = endingHeight+1 - startingHeight;
+        size   = (endingWidth+1 - startingWidth) * (endingHeight+1 - startingHeight) * channels;
+        data   = new uint8_t[size];
+
+        for(int i = 0; i < (int)size; i++){
+            data[i] = tempImgData[i];
+        }
+
+        return *this;
+    }
     

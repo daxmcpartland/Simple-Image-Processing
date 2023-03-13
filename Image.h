@@ -40,6 +40,9 @@ private:
     ImageType getFileType(const char* filename);
 
 public:
+
+    int widthSize();
+    int heightSize();
     Image(const char* filename);
     Image(int width, int height, int channels);
     Image(const Image& other);
@@ -54,5 +57,11 @@ public:
     Image& colorMask(float r, float g, float b);
 
     std::vector<std::string> convertToAscii(const std::string densityString);
+
+    // Image& combineImage(Image& img);
+
+    Image& resize(int width, int height);
+
+    Image& crop(int startingWidth, int endingWidth, int startingHeight, int endingHeight);
 };
 #endif
